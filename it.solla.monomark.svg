@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128">
+  <!-- Icona di Monomark: due M in un rettangolo arrotondato, senza fondo,
+       nell'arancione di Tokyo Night (il tema predefinito di Omarchy) e con
+       il tratto delle icone Lucide usate nell'app. -->
+  <g fill="none" stroke="#ff9e64" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="5" y="14" width="118" height="100" rx="18"/>
+    <path d="M28 82V46L42 64L56 46V82" transform="rotate(-10 42 64)"/>
+    <path d="M72 82V46L86 64L100 46V82" transform="rotate(10 86 64)"/>
+  </g>
+</svg>

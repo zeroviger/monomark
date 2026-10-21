@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=Monomark
+GenericName=Appunti
+Comment=Appunti in Markdown, salvati in automatico
+Exec=monomark %F
+Icon=it.solla.monomark
+Terminal=false
+Categories=Utility;TextEditor;
+MimeType=text/markdown;text/x-markdown;text/plain;
+Keywords=note;appunti;markdown;
+StartupWMClass=it.solla.monomark
