@@ -1,6 +1,6 @@
 # Esempio di Monomark
 
-Questa nota mostra tutto ciò che l'anteprima sa visualizzare. Aprila con **Apri** (<kbd>Ctrl</kbd>+<kbd>O</kbd>) o trascinala sulla finestra, poi premi <kbd>Ctrl</kbd>+<kbd>E</kbd> per vedere l'anteprima accanto al testo.
+Questa nota mostra tutto ciò che l'anteprima sa visualizzare. Aprila con **Apri** (<kbd>Ctrl</kbd>+<kbd>O</kbd>) o trascinala sulla finestra, poi premi <kbd>Ctrl</kbd>+<kbd>E</kbd> per vedere l'anteprima al posto del testo.
 
 ---
 

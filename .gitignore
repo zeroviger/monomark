@@ -1,2 +1,7 @@
 # Binario compilato
 /monomark
+
+# Documentazione e script locali, fuori da git
+/docs/
+/manuale.sh
+/resume.sh

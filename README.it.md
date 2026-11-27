@@ -6,8 +6,6 @@ Appunti in Markdown per il desktop Linux, scritti in Go con GTK 4.
 Pensato per [Omarchy](https://omarchy.org): segue il tema attivo e ha lo
 stesso aspetto del file manager [Strata](https://github.com/lgse/strata).
 
-![Monomark con l'anteprima Markdown affiancata](docs/monomark-it.png)
-
 Ogni nota è un normale file `.md`: niente database e nessun formato
 proprietario. Si scrive, e Monomark salva da solo.
 
@@ -18,8 +16,11 @@ proprietario. Si scrive, e Monomark salva da solo.
   scrivere subito il file aperto, senza finestre. Il titolo della nota è la
   sua prima riga.
 - **Lista delle note** dalla più recente, con **ricerca** nel testo di tutte
-  le note.
-- **Anteprima Markdown** affiancata all'editor, con le estensioni GitHub:
+  le note. Si allarga trascinandone il bordo, oppure si nasconde e si
+  riapre con il pulsante in alto a sinistra (<kbd>F9</kbd>) per scrivere a
+  tutta larghezza; al riavvio resta com'era.
+- **Anteprima Markdown** al posto dell'editor (<kbd>Ctrl</kbd>+<kbd>E</kbd>
+  passa dall'uno all'altra), con le estensioni GitHub:
   tabelle, barrato, liste di attività e link automatici. Nei blocchi di codice
   la sintassi è colorata, sia nell'anteprima sia nell'editor. Le immagini
   locali (percorso assoluto, `~/`, `file://` o relativo alla nota) vengono
@@ -29,7 +30,13 @@ proprietario. Si scrive, e Monomark salva da solo.
   `<a>`, `<br>`, `<hr>`, titoli, paragrafi ed elenchi; tag sconosciuti,
   commenti e script vengono nascosti.
 - **Menu di formattazione** che mostra accanto a ogni comando il suo
-  marcatore Markdown, per impararli strada facendo.
+  marcatore Markdown, per impararli strada facendo. *Blocco di codice*
+  elenca i linguaggi con i colori della sintassi (Bash, C, C++, C#, CSS,
+  Diff, Dockerfile, Go, HTML, INI, Java, JavaScript, JSON, Kotlin, Lua,
+  Makefile, Markdown, PHP, Python, Ruby, Rust, SQL, Swift, TOML, TypeScript,
+  XML, YAML) e scrive il nome giusto dopo ```` ``` ````; gli altri linguaggi
+  che [Chroma](https://github.com/alecthomas/chroma) conosce si possono
+  scrivere a mano.
 - **Salva con nome** in qualunque cartella, con la finestra di sistema
   (la stessa di Apri). Propone come nome il titolo della nota e chiede
   conferma prima di sostituire un file esistente.
@@ -47,6 +54,15 @@ proprietario. Si scrive, e Monomark salva da solo.
 - **Tema dal vivo**: colori del tema Omarchy attivo, carattere JetBrains Mono
   e icone [Lucide](https://lucide.dev) come Strata. Cambiando tema la
   finestra si aggiorna senza riavvio.
+- **Impostazioni** (l'ingranaggio accanto alla X, o <kbd>Ctrl</kbd>+<kbd>,</kbd>),
+  in una finestra al centro dell'app: carattere, dimensione e
+  interlinea di editor e anteprima (qualunque carattere a larghezza fissa
+  installato, che vale anche per la stampa), i quattro margini di stampa, la
+  dimensione del testo in stampa (10 pt, oppure quella dell'editor
+  convertita in punti: 16 px → 12 pt) e il numero di pagina in stampa:
+  nessuno, `2`, `2 / 5`, `Pagina 2 di 5` o `Titolo · 2 / 5`, a sinistra,
+  al centro o a destra. *Ripristina* torna a JetBrains Mono,
+  16 px, interlinea 3 px, margini di 1,6 cm, `Titolo · 2 / 5` al centro.
 
 Per vedere tutto ciò che l'anteprima sa mostrare, apri
 [`esempio.md`](esempio.md) con <kbd>Ctrl</kbd>+<kbd>O</kbd> e premi
@@ -62,7 +78,9 @@ Per vedere tutto ciò che l'anteprima sa mostrare, apri
 | <kbd>Ctrl</kbd>+<kbd>Maiusc</kbd>+<kbd>S</kbd> | Salva con nome |
 | <kbd>Ctrl</kbd>+<kbd>P</kbd> | Stampa |
 | <kbd>Ctrl</kbd>+<kbd>F</kbd> | Cerca nelle note |
-| <kbd>Ctrl</kbd>+<kbd>E</kbd> | Mostra o nascondi l'anteprima |
+| <kbd>Ctrl</kbd>+<kbd>E</kbd> | Passa dall'editor all'anteprima e viceversa |
+| <kbd>F9</kbd> | Nasconde o mostra la lista delle note |
+| <kbd>Ctrl</kbd>+<kbd>,</kbd> | Impostazioni |
 | <kbd>Ctrl</kbd>+<kbd>B</kbd> | Grassetto |
 | <kbd>Ctrl</kbd>+<kbd>I</kbd> | Corsivo |
 | <kbd>Ctrl</kbd>+<kbd>K</kbd> | Link |
@@ -139,27 +157,28 @@ file `monomark` in sé non ha un'icona propria nel file manager.
 | Icona dell'app, per quando non è installata | `~/.cache/monomark/app/` |
 | Colori letti dal tema Omarchy | `~/.local/state/omarchy/current/theme/colors.toml` |
 | Dimensione del testo letta da Strata | `~/.config/strata/settings.toml`, chiave `text_size` |
+| Impostazioni scelte in Monomark (carattere, interlinea, margini, numero di pagina) | `~/.config/monomark/impostazioni.toml` |
+| Lista delle note nascosta (esiste solo finché lo è) | `~/.local/state/monomark/lista-nascosta` |
 
 Una nota svuotata del tutto viene rimossa dal disco, ma solo se sta nella
 cartella delle note: un file aperto da un'altra cartella resta sempre.
 
 ## Struttura del codice
 
-| File | Contenuto |
+`main.go` si limita ad avviare l'app; il codice è nei pacchetti di
+`internal/`, la struttura che Go consiglia per un comando con pacchetti di
+supporto.
+
+| Percorso | Contenuto |
 | --- | --- |
-| `main.go` | Avvio, finestra, lista, editor, salvataggio automatico, messaggi nel terminale |
-| `note.go` | Le note su disco: lettura, salvataggio, spostamento, file esterni |
-| `markdown.go` | Conversione Markdown → markup Pango per l'anteprima |
-| `formato.go`, `menu.go` | Menu e comandi di formattazione |
-| `salva.go` | "Salva con nome" con la finestra di sistema |
-| `apri.go` | Apertura di file, trascinamento, file esterni |
-| `elimina.go` | Cestino con conferma |
-| `html.go` | La parte di HTML interpretata dall'anteprima |
-| `immagini.go` | Immagini nell'anteprima: ricerca, riduzione, memoria |
-| `stampa.go` | Stampa e impaginazione |
-| `tema.go` | CSS, colori del tema Omarchy e ricarica dal vivo |
-| `lingua.go` | Lingua del sistema e traduzioni inglesi |
-| `icone.go`, `icone/` | Icone Lucide colorate secondo il tema, icona dell'app |
+| `main.go` | Avvio: incorpora l'icona dell'app e apre la finestra |
+| `internal/finestra/` | App GTK: finestra, lista, editor, salvataggio automatico, apri/salva/cestino, menu di formattazione, immagini dell'anteprima, stampa, CSS e ricarica del tema |
+| `internal/finestra/icone/` | Icone Lucide, colorate secondo il tema |
+| `internal/note/` | Le note su disco: lettura, salvataggio, spostamento, file esterni e nascosti |
+| `internal/markdown/` | Markdown e sottoinsieme di HTML → markup Pango per l'anteprima, colori del codice, percorsi delle immagini |
+| `internal/formato/` | Modifiche al testo dietro il menu di formattazione |
+| `internal/tema/` | Colori del tema Omarchy e dimensione del testo di Strata |
+| `internal/lingua/` | Lingua del sistema e traduzioni inglesi |
 | `it.solla.monomark.svg`, `.desktop` | Icona dell'app e voce nel menu delle applicazioni |
 
 ## Ringraziamenti
@@ -167,7 +186,7 @@ cartella delle note: un file aperto da un'altra cartella resta sempre.
 - [gotk4](https://github.com/diamondburned/gotk4): binding GTK 4 per Go
 - [goldmark](https://github.com/yuin/goldmark): parser Markdown
 - [Chroma](https://github.com/alecthomas/chroma): colorazione della sintassi
-- [Lucide](https://lucide.dev): icone, licenza ISC (vedi `icone/LICENSE`)
+- [Lucide](https://lucide.dev): icone, licenza ISC (vedi `internal/finestra/icone/LICENSE`)
 - [Strata](https://github.com/lgse/strata), da cui viene lo stile
 
 ## Licenza
@@ -180,4 +199,4 @@ Software Foundation, nella versione 3 o (a tua scelta) in una qualunque
 versione successiva. È distribuito SENZA ALCUNA GARANZIA; per i dettagli
 vedi la licenza.
 
-Le icone Lucide in `icone/` hanno la propria licenza ISC.
+Le icone Lucide in `internal/finestra/icone/` hanno la propria licenza ISC.

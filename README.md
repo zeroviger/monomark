@@ -6,8 +6,6 @@ Markdown notes for the Linux desktop, written in Go with GTK 4.
 Designed for [Omarchy](https://omarchy.org): it follows the active theme and
 looks like the [Strata](https://github.com/lgse/strata) file manager.
 
-![Monomark with the side-by-side Markdown preview](docs/monomark.png)
-
 Every note is a plain `.md` file: no database, no proprietary format.
 Just write, and Monomark saves for you.
 
@@ -17,8 +15,11 @@ Just write, and Monomark saves for you.
   **Save** (<kbd>Ctrl</kbd>+<kbd>S</kbd>) to write the open file right away,
   without any dialog. A note's title is its first line.
 - **Note list** sorted by most recent, with **full-text search** across all
-  notes.
-- **Markdown preview** next to the editor, with the GitHub extensions:
+  notes. Drag its edge to resize it, or hide and show it with the button at
+  the top left (<kbd>F9</kbd>) to write on the full width; it stays that
+  way at the next start.
+- **Markdown preview** in place of the editor (<kbd>Ctrl</kbd>+<kbd>E</kbd>
+  switches between the two), with the GitHub extensions:
   tables, strikethrough, task lists and autolinks. Code blocks are
   syntax-highlighted in both the preview and the editor. Local images
   (absolute paths, `~/`, `file://` or relative to the note) are shown and
@@ -28,7 +29,12 @@ Just write, and Monomark saves for you.
   headings, paragraphs and lists; unknown tags, comments and scripts are
   hidden.
 - **Formatting menu** that shows the Markdown marker next to each command,
-  so you learn the syntax along the way.
+  so you learn the syntax along the way. *Code block* lists the languages
+  that get syntax colors (Bash, C, C++, C#, CSS, Diff, Dockerfile, Go, HTML,
+  INI, Java, JavaScript, JSON, Kotlin, Lua, Makefile, Markdown, PHP, Python,
+  Ruby, Rust, SQL, Swift, TOML, TypeScript, XML, YAML) and writes the right
+  name after ```` ``` ````; any other language known to
+  [Chroma](https://github.com/alecthomas/chroma) can be typed by hand.
 - **Save as** to any folder, with the system file dialog (the same one as
   Open). The note's title is suggested as the file name, and replacing an
   existing file asks for confirmation.
@@ -46,6 +52,15 @@ Just write, and Monomark saves for you.
 - **Live theming**: colors from the active Omarchy theme, the JetBrains
   Mono font and [Lucide](https://lucide.dev) icons, just like Strata.
   Switching theme updates the window without a restart.
+- **Settings** (the gear next to the X, or <kbd>Ctrl</kbd>+<kbd>,</kbd>), in a
+  window in the middle of the app: font, size and line spacing of the
+  editor and the preview (any installed monospaced font, also used for
+  printing), the four print margins, the printed text size (10 pt, or the
+  editor's size converted to points: 16 px → 12 pt), and the printed page
+  number: none, `2`, `2 / 5`, `Page 2 of 5`
+  or `Title · 2 / 5`, on the left, center or right. *Reset* goes back to
+  JetBrains Mono, 16 px, line spacing 3 px, 1.6 cm margins, `Title · 2 / 5`
+  centered.
 
 To see everything the preview can show, open [`esempio.md`](esempio.md)
 (in Italian) with <kbd>Ctrl</kbd>+<kbd>O</kbd> and press
@@ -61,7 +76,9 @@ To see everything the preview can show, open [`esempio.md`](esempio.md)
 | <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>S</kbd> | Save as |
 | <kbd>Ctrl</kbd>+<kbd>P</kbd> | Print |
 | <kbd>Ctrl</kbd>+<kbd>F</kbd> | Search notes |
-| <kbd>Ctrl</kbd>+<kbd>E</kbd> | Show or hide the preview |
+| <kbd>Ctrl</kbd>+<kbd>E</kbd> | Switch between editor and preview |
+| <kbd>F9</kbd> | Hide or show the notes list |
+| <kbd>Ctrl</kbd>+<kbd>,</kbd> | Settings |
 | <kbd>Ctrl</kbd>+<kbd>B</kbd> | Bold |
 | <kbd>Ctrl</kbd>+<kbd>I</kbd> | Italic |
 | <kbd>Ctrl</kbd>+<kbd>K</kbd> | Link |
@@ -138,6 +155,8 @@ because it is also built into the program. Like every Linux program, the
 | App icon, for when it is not installed | `~/.cache/monomark/app/` |
 | Colours read from the Omarchy theme | `~/.local/state/omarchy/current/theme/colors.toml` |
 | Text size read from Strata | `~/.config/strata/settings.toml`, key `text_size` |
+| Settings chosen in Monomark (font, line spacing, margins, page number) | `~/.config/monomark/impostazioni.toml` |
+| Notes list hidden (exists only while it is) | `~/.local/state/monomark/lista-nascosta` |
 
 A note that is emptied completely is removed from disk, but only if it lives
 in the notes folder: a file opened from another folder always stays.
@@ -146,23 +165,21 @@ in the notes folder: a file opened from another folder always stays.
 
 The code and its comments are in Italian. Interface strings are written in
 Italian and translated by `tr()`; the English translations live in
-`lingua.go`, and a test fails if a string has no translation.
+`internal/lingua/lingua.go`, and a test fails if a string has no translation.
 
-| File | Contents |
+`main.go` only starts the app; the code is in packages under `internal/`,
+the layout Go recommends for a command with supporting packages.
+
+| Path | Contents |
 | --- | --- |
-| `main.go` | Startup, window, list, editor, autosave, terminal messages |
-| `note.go` | Notes on disk: reading, saving, moving, external files |
-| `markdown.go` | Markdown → Pango markup conversion for the preview |
-| `formato.go`, `menu.go` | Formatting menu and commands |
-| `salva.go` | "Save as" with the system file dialog |
-| `apri.go` | Opening files, drag and drop, external files |
-| `elimina.go` | Trash with confirmation |
-| `html.go` | The HTML subset understood by the preview |
-| `immagini.go` | Images in the preview: finding, scaling, caching |
-| `stampa.go` | Printing and pagination |
-| `tema.go` | CSS, Omarchy theme colors and live reload |
-| `lingua.go` | System language detection and English translations |
-| `icone.go`, `icone/` | Lucide icons colored by the theme, app icon |
+| `main.go` | Entry point: embeds the app icon and starts the window |
+| `internal/finestra/` | GTK app: window, list, editor, autosave, open/save/trash, formatting menu, preview images, printing, CSS and live theme reload |
+| `internal/finestra/icone/` | Lucide icons, colored by the theme |
+| `internal/note/` | Notes on disk: reading, saving, moving, external and hidden files |
+| `internal/markdown/` | Markdown and HTML subset → Pango markup for the preview, code highlighting, image paths |
+| `internal/formato/` | Text edits behind the formatting menu |
+| `internal/tema/` | Omarchy theme colors and Strata text size |
+| `internal/lingua/` | System language detection and English translations |
 | `it.solla.monomark.svg`, `.desktop` | App icon and application menu entry |
 
 ## Credits
@@ -170,7 +187,7 @@ Italian and translated by `tr()`; the English translations live in
 - [gotk4](https://github.com/diamondburned/gotk4): GTK 4 bindings for Go
 - [goldmark](https://github.com/yuin/goldmark): Markdown parser
 - [Chroma](https://github.com/alecthomas/chroma): syntax highlighting
-- [Lucide](https://lucide.dev): icons, ISC license (see `icone/LICENSE`)
+- [Lucide](https://lucide.dev): icons, ISC license (see `internal/finestra/icone/LICENSE`)
 - [Strata](https://github.com/lgse/strata), which inspired the look
 
 ## License
@@ -183,4 +200,4 @@ Free Software Foundation, either version 3 of the License, or (at your
 option) any later version. It is distributed WITHOUT ANY WARRANTY; see the
 license for details.
 
-The Lucide icons in `icone/` have their own ISC license.
+The Lucide icons in `internal/finestra/icone/` have their own ISC license.
